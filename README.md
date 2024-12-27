@@ -16,7 +16,7 @@
 
    ​	cd 你的项目目录路径
    	npm init -y
-   	npm install express   --如果下载缓慢可以使用：npm install express --registry=https://registry.npmmirror.com转到国内源下载
+   	npm install express   --如果下载缓慢可以使用：npm install express --registry=https://registry.npmmirror.com 转到国内源下载
 
 4. 运行服务器：node server.js
 
