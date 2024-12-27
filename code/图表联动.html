@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #crq_1 {
+            width: 600px;
+            height: 400px;
+            /* background-color: aquamarine; */
+        }
+        
+        #crq_2 {
+            width: 600px;
+            height: 400px;
+            /* background-color: paleturquoise; */
+        }
+    </style>
+    <script src="../js/echarts.js"></script>
+    <script src="../js/jquery-3.3.1.js"></script>
+</head>
+
+<body>
+    <div id="crq_1"></div>
+    <div id="crq_2"></div>
+    <script>
+        var myChart1 = echarts.init(document.getElementById("crq_1"));
+
+        var waterMarkText = '水印';
+        var canvas = document.createElement('canvas');
+        var crq = canvas.getContext('2d');
+        canvas.width = canvas.height = 100;
+        crq.textAlign = 'center';
+        crq.textBaseline = 'middle';
+        crq.globalAlpha = 0.2;
+        crq.font = '20px Microsoft Yahei';
+        crq.translate(50, 50);
+        crq.rotate(-Math.PI / 4);
+        crq.fillText(waterMarkText, 0, 0);
+
+        myChart1.setOption({
+            backgroundColor: {
+                image: canvas
+            },
+            title: {
+                text: '咖啡店各年订单分析',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 22,
+                top: 22,
+                data: ["2012年", "2013年", "2014年", "2015年", "2016年", "2017年"]
+            },
+            toolbox: {
+                show: true,
+                left: 644,
+                top: 28,
+                feature: {
+                    mark: {
+                        show: true
+                    },
+                    dataView: {
+                        show: true,
+                        readOnly: false
+                    },
+                    magicType: {
+                        show: true,
+                        type: ['pie', 'funnel'],
+                        option: {
+                            funnel: {
+                                x: '25%',
+                                width: '50%',
+                                funnelAlign: 'left',
+                                max: 1548
+                            }
+                        }
+                    },
+                    restore: {
+                        show: true
+                    },
+                    saveAsImage: {
+                        show: true
+                    }
+                }
+            },
+            calculable: true,
+            series: [{
+                itemStyle: {
+                    normal: {
+                        color: function(params) {
+                            var colorList = [
+                                'red', 'Cyan', 'pink',
+                                'blue', 'green', 'purple'
+                            ];
+                            return colorList[params.dataIndex]
+                        },
+                    }
+                },
+                name: '订单',
+                type: 'pie',
+                clockWise: true,
+                label: {
+                    normal: {
+                        formatter: '{b}',
+                        show: true,
+                        position: "left"
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        show: true
+                    }
+                },
+                data: []
+            }]
+        });
+        $.ajax({
+            type: 'get',
+            url: '../data/咖啡店各年订单.json', //请求数据的地址
+            dataType: "json", //返回数据形式为json
+            success: function(result) {
+                //请求成功时执行该函数内容，result即为服务器返回的json对象
+
+                myChart1.hideLoading(); //隐藏加载动画
+                myChart1.setOption({ //加载数据图表
+
+                    series: [{
+                        name: '饼图',
+                        type: 'pie',
+                        data: result.data
+                    }]
+                });
+            },
+            error: function(errorMsg) {
+                //请求失败时执行该函数
+                alert("图表请求数据失败!");
+                myChart1.hideLoading();
+            }
+        });
+
+
+        var myChart2 = echarts.init(document.getElementById("crq_2"))
+
+
+        myChart2.setOption({
+            backgroundColor: {
+                image: canvas
+            },
+            title: {},
+            legend: {
+                left: 'center',
+                // data: [''],
+                top: 12
+            },
+            tooltip: {
+                confine: true,
+                enterable: true,
+                trigger: 'axis'
+            },
+            xAxis: {
+                type: 'category',
+                data: []
+            },
+            yAxis: [{
+                type: 'value',
+                name: '销量',
+                min: 0,
+                max: 100,
+                // position: 'right',
+                offset: 0,
+                axisLine: {
+                    lineStyle: {
+                        color: 'pink'
+                    }
+                },
+                axisLabel: {
+                    formatter: '{value}'
+                }
+            }],
+            series: [{
+                name: "Milk Tea",
+                type: 'line',
+                itemStyle: {
+                    normal: {
+                        color: 'green'
+                    }
+                },
+                data: [],
+            }, {
+                name: "Matcha Latte",
+                type: 'line',
+                itemStyle: {
+                    normal: {
+                        color: 'blue'
+                    }
+                },
+                data: [],
+            }, {
+                name: "Cheese Cocoa",
+                type: 'line',
+                itemStyle: {
+                    normal: {
+                        color: 'black'
+                    }
+                },
+                data: [],
+            }, {
+                name: "Walnut Brownie",
+                type: 'line',
+                itemStyle: {
+                    normal: {
+                        color: 'red'
+                    }
+                },
+                data: [],
+            }]
+        });
+        $.ajax({
+            type: 'get',
+            url: '../data/咖啡店各年订单.json', //请求数据的地址
+            dataType: "json", //返回数据形式为json
+            success: function(result) {
+                //请求成功时执行该函数内容，result即为服务器返回的json对象
+
+                myChart2.hideLoading(); //隐藏加载动画
+                myChart2.setOption({ //加载数据图表
+
+                    series: [{
+                        name: "Milk Tea",
+                        type: 'line',
+                        data: result.values1,
+                    }, {
+                        name: "Matcha Latte",
+                        type: 'line',
+                        data: result.values2,
+                    }, {
+                        name: "Cheese Cocoa",
+                        type: 'line',
+                        data: result.values3,
+                    }, {
+                        name: "Walnut Brownie",
+                        type: 'line',
+                        data: result.values4,
+                    }]
+                });
+            },
+            error: function(errorMsg) {
+                //请求失败时执行该函数
+                alert("图表请求数据失败!");
+                myChart2.hideLoading();
+            }
+        });
+        echarts.connect([myChart1, myChart2]);
+    </script>
+</body>
+
+</html>

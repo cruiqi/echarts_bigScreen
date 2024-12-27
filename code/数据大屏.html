@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据大屏</title>
+    <!-- js文件 -->
+    <script src="../js/echarts.js"></script>
+    <script src="../js/jquery-3.3.1.js"></script>
+    <!-- 调用js文件，异步加载数据 -->
+    <script src="../data/不同支付方式用户人数.js"></script>
+    <script src="../data/各类商品存货周转天数.js"></script>
+    <script src="../data/近5日新增和流失用户数据.js"></script>
+    <!-- <script src="../data/售货机销售金额及其环比增长率.js"></script> -->
+    
+    <style>
+        /* 全局样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a3e, #0a2472, #06114f);
+            background-size: 400% 400%;
+            animation: gradientMove 15s ease infinite;
+            color: #fff;
+            font-family: "微软雅黑";
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 标题样式 */
+        #crq_sz {
+            width: 100%;
+            height: 80px;
+            font-size: 42px;
+            margin: 20px 0;
+            text-align: center;
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 0 0 10px #4facfe,
+                         0 0 20px #4facfe,
+                         0 0 40px #4facfe;
+            position: relative;
+            letter-spacing: 5px;
+        }
+
+        #crq_sz::before,
+        #crq_sz::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            height: 3px;
+            width: 200px;
+            background: linear-gradient(90deg, transparent, #4facfe, transparent);
+        }
+
+        #crq_sz::before {
+            left: 25%;
+            animation: slideLeft 2s ease-in-out infinite;
+        }
+
+        #crq_sz::after {
+            right: 25%;
+            animation: slideRight 2s ease-in-out infinite;
+        }
+
+        @keyframes slideLeft {
+            0%, 100% { transform: translateX(-50px); opacity: 0; }
+            50% { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideRight {
+            0%, 100% { transform: translateX(50px); opacity: 0; }
+            50% { transform: translateX(0); opacity: 1; }
+        }
+
+        /* 图表容器样式 */
+        #crq_1, #crq_2, #crq_3, #crq_4 {
+            background: rgba(10, 36, 114, 0.2);
+            backdrop-filter: blur(8px);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(79, 172, 254, 0.1);
+        }
+
+        /* 容器发光边框效果 */
+        #crq_1::before, #crq_2::before, #crq_3::before, #crq_4::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(79, 172, 254, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        #crq_1:hover::before, #crq_2:hover::before, #crq_3:hover::before, #crq_4:hover::before {
+            left: 100%;
+        }
+
+        /* 悬停效果 */
+        #crq_1:hover, #crq_2:hover, #crq_3:hover, #crq_4:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.15);
+            border-color: rgba(79, 172, 254, 0.3);
+        }
+
+        /* 数据流动效果 */
+        .data-stream {
+            position: absolute;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                transparent,
+                #4facfe,
+                transparent
+            );
+            opacity: 0;
+        }
+
+        .data-stream-1 { left: 20%; animation: streamMove 3s infinite 0.5s; }
+        .data-stream-2 { left: 40%; animation: streamMove 3s infinite 1s; }
+        .data-stream-3 { left: 60%; animation: streamMove 3s infinite 1.5s; }
+        .data-stream-4 { left: 80%; animation: streamMove 3s infinite 2s; }
+
+        @keyframes streamMove {
+            0% { transform: translateY(-100%); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+
+        /* 图表容器尺寸和布局 */
+        #crq_big {
+            width: 95%;
+            max-width: 1560px;
+            height: 780px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        #crq_1, #crq_2, #crq_3 {
+            width: calc(33% - 20px);
+            min-width: 400px;
+            height: 380px;
+        }
+
+        #crq_4 {
+            width: calc(100% - 40px);
+            height: 320px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="crq_sz">智能数据可视化平台</div>
+    <div id="crq_big">
+        <div id="crq_1"></div>
+        <div id="crq_2"></div>
+        <div id="crq_3"></div>
+        <div id="crq_4"></div>
+    </div>
+    <script>
+        // 添加数据流动效果
+        document.querySelectorAll('#crq_1, #crq_2, #crq_3, #crq_4').forEach(container => {
+            for(let i = 1; i <= 4; i++) {
+                const stream = document.createElement('div');
+                stream.className = `data-stream data-stream-${i}`;
+                container.appendChild(stream);
+            }
+        });
+
+        // 修改图表配置主题
+        const chartTheme = {
+            backgroundColor: 'transparent',
+            textStyle: { color: '#fff' },
+            title: { 
+                textStyle: { 
+                    color: '#fff',
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    textShadow: '0 0 10px rgba(79, 172, 254, 0.5)'
+                },
+                left: '20px',
+                top: '10px',
+                backgroundColor: 'rgba(79, 172, 254, 0.2)',
+                borderRadius: 4,
+                padding: [8, 15],
+                borderLeft: '3px solid #4facfe'
+            },
+            legend: { 
+                textStyle: { color: 'rgba(255, 255, 255, 0.8)' }
+            },
+            xAxis: {
+                axisLine: { lineStyle: { color: 'rgba(79, 172, 254, 0.3)' } },
+                axisLabel: { color: '#fff' }
+            },
+            yAxis: {
+                axisLine: { lineStyle: { color: 'rgba(79, 172, 254, 0.3)' } },
+                axisLabel: { color: '#fff' },
+                splitLine: { lineStyle: { color: 'rgba(79, 172, 254, 0.1)' } }
+            }
+        };
+
+        var myChart = echarts.init(document.getElementById('crq_4'));
+
+        myChart.setOption({
+            ...chartTheme,  // 应用新主题
+            title: {
+                ...chartTheme.title,
+                text: '售货机销售金额及环比增长率'
+            },
+            legend: {
+                data: ["销售金额", "销售金额环比增长率"]
+            },
+            xAxis: [{
+                type: 'category',
+                data: []
+            }],
+            yAxis: [{
+                type: "value",
+                axisLabel: {
+                    formatter: '{value}'
+                }
+            }, {
+                type: "value",
+                axisLabel: {
+                    formatter: '{value}'
+                }
+            }],
+            series: [{
+                name: '销售金额',
+                type: 'bar',
+                data: []
+            }, {
+                name: '销售金额环比增长率',
+                type: 'line',
+                yAxisIndex: 1,
+                data: []
+            }],
+        });
+
+        $.ajax({
+            type: 'get',
+            url: '../JSON_data/售货机销售金额及其环比增长率.json', //请求数据的地址
+            dataType: "json",
+            success: function(result) {
+                myChart.hideLoading(); //隐藏加载动画
+                myChart.setOption({ //加载数据图表
+                    xAxis: [{
+                        type: 'category',
+                        data: result.日期
+                    }],
+                    series: [{
+                        name: "销售金额",
+                        type: 'bar',
+                        data: result.销售金额
+                    }, {
+                        name: "销售金额环比增长率",
+                        type: 'line',
+                        data: result.销售金额环比增长率
+                    }]
+                });
+            },
+            error: function(errorMsg) {
+                //请求失败时执行该函数
+                alert("图表请求数据失败!");
+                myChart.hideLoading();
+            }
+        });
+    </script>
+</body>
+
+</html>
