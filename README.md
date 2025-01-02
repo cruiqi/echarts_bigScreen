@@ -10,7 +10,7 @@
 
 1. 代码含有echarts和jquery，可直接下载
 
-2. 需要安装node，下载地址为：http://nodejs.org/zh-cn/。配置环境变量后在终端(CMD)或powershell输入 node --version查看是否安装成功
+2. 需要安装node，下载地址为：http://nodejs.org/zh-cn/ 。配置环境变量后在终端(CMD)或powershell输入 node --version查看是否安装成功
 
 3. 在命令行中cd到项目目录下初始化项目和安装依赖：
 
